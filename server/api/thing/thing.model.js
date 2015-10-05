@@ -3,10 +3,17 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
-var ThingSchema = new Schema({
+var StockPriceSchema = new Schema({
+  date: Date,
+  price: Number
+})
+
+var StockSchema = new Schema({
+  code: String,
   name: String,
-  info: String,
-  active: Boolean
+  active: Boolean,
+  data : [StockPriceSchema]
 });
 
-module.exports = mongoose.model('Thing', ThingSchema);
+
+module.exports = mongoose.model('Stock', StockSchema);

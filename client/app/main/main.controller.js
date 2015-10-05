@@ -2,11 +2,13 @@
 
 angular.module('stockApp')
   .controller('MainCtrl', function ($scope, $http, socket) {
-    $scope.awesomeThings = [];
+    $scope.stocksData = [];
 
-    $http.get('/api/things').success(function(awesomeThings) {
-      $scope.awesomeThings = awesomeThings;
-      socket.syncUpdates('thing', $scope.awesomeThings);
+    $http.get('/api/things/AAPL').success(function(stockData) {
+      $scope.data = [stockData.data];
+        $scope.labels = stockData.labels;
+      $scope.series = [];
+      //socket.syncUpdates('thing', $scope.awesomeThings);
     });
 
     $scope.addThing = function() {

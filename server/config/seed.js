@@ -5,11 +5,11 @@
 
 'use strict';
 
-var Thing = require('../api/thing/thing.model');
+var Stock = require('../api/thing/thing.model');
 
 
-Thing.find({}).remove(function() {
-  Thing.create({
+Stock.find({}).remove(function() {
+  Stock.create({
     name : 'Development Tools',
     info : 'Integration with popular tools such as Bower, Grunt, Karma, Mocha, JSHint, Node Inspector, Livereload, Protractor, Jade, Stylus, Sass, CoffeeScript, and Less.'
   }, {

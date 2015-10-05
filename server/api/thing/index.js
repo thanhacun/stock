@@ -5,6 +5,8 @@ var controller = require('./thing.controller');
 
 var router = express.Router();
 
+//route to get stock code
+router.get('/:stockCode', controller.getStockCode);
 router.get('/', controller.index);
 router.get('/:id', controller.show);
 router.post('/', controller.create);

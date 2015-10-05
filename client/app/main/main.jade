@@ -6,11 +6,14 @@ header#banner.hero-unit
     p.lead Kick-start your next web app with Angular Fullstack
     img(src='assets/images/yeoman.png', alt='I\'m Yeoman')
 
+.container.chart-area
+  canvas.chart.chart-line(id='line', chart-data='data', chart-labels='labels', chart-series='series')
+
 .container
   .row
     .col-lg-12
       h1.page-header Features:
-      ul.nav.nav-tabs.nav-stacked.col-md-4.col-lg-4.col-sm-6(ng-repeat='thing in awesomeThings')
+      ul.nav.nav-tabs.nav-stacked.col-md-4.col-lg-4.col-sm-6(ng-repeat='stock in stocks')
         li
           a(href='#', tooltip='{{thing.info}}')
             | {{thing.name}}
