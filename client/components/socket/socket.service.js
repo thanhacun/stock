@@ -41,14 +41,12 @@ angular.module('stockApp')
 
           // replace oldItem if it exists
           // otherwise just add item to the collection
-          console.log(array, item);
           if (oldItem) {
             array.splice(index, 1, item);
             event = 'updated';
           } else {
             array.push(item);
           }
-          console.log('Added', array);
           cb(event, item, array);
         });
 
@@ -58,7 +56,6 @@ angular.module('stockApp')
         socket.on(modelName + ':remove', function (item) {
           var event = 'deleted';
           _.remove(array, {_id: item._id});
-          console.log('Remove', array);
           cb(event, item, array);
         });
       },

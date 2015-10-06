@@ -45,7 +45,7 @@ angular.module('stockApp')
     };
 
     $scope.chartShow = function() {
-      if ($scope.stocksData.length !== 0) {
+      if ($scope.stocks.length !== 0) {
         //console.log($scope.stocksData);
         Plotly.newPlot($scope.stockChart, $scope.stocks, $scope.chartLayout);
       }
@@ -54,54 +54,32 @@ angular.module('stockApp')
     //Get saved stocks and Show chart
     $http.get('/api/things').success(function(stocks) {
       $scope.stocks = stocks;
-      console.log($scope.stocks);
-      Plotly.newPlot($scope.stockChart, $scope.stocks, $scope.chartLayout);
-    });
-    //$scope.stocksDataUpdate($scope.chartShow);
+      $scope.chartShow();
 
-    socket.syncUpdates('stock', $scope.stocks, function(e, i, a) {
-      console.log(e, i, a);
+      //TODO: WHY syncUpdates has to be here
+      socket.syncUpdates('stock', $scope.stocks, function(e, i, a) {
+        //console.log(e, i, a);
+        $scope.chartShow();
+        Plotly.newPlot($scope.stockChart, $scope.stocks, $scope.chartLayout);
+      });
+
     });
 
     $scope.addStock = function() {
       if($scope.stockCode === '') return;
       //check duplicate
-      /*
       if ($scope.stocks.filter(function(stock) {return stock.code === $scope.stockCode;}).length > 0) {
         alert ('Already added');
-        $scope.stockCode = '';
         return;
       }
-      */
-
+      //add new stock
       $http.post('/api/things', {code: $scope.stockCode.toUpperCase()}).success(function(stock) {
         $scope.stockCode = '';
-        console.log($scope.stocks);
-        //Plotly.newPlot($scope.stockChart, $scope.stocks, $scope.chartLayout);
       });
-      //TODO: sync between clients
-      //socket.syncUpdates('stock', $scope.stocks);
-      //$scope.stockDataUpdate({code: $scope.stockCode.toUpperCase()}, $scope.chartShow);
     };
 
     $scope.deleteStock = function(stock) {
-      console.log(stock);
       $http.delete('/api/things/' + stock._id);
-      //remove stock
-      /*
-      $scope.stocks = $scope.stocks.filter(function(s) {
-        return s.code !== stock.code
-      });
-      */
-
-      //remove data and update chart
-      //TODO: use socket.io
-      /*
-      $scope.stocksData = $scope.stocksData.filter(function(s) {
-        return s.name !== stock.code;
-      });
-      $scope.chartShow();
-      */
     };
 
     $scope.$on('$destroy', function () {
