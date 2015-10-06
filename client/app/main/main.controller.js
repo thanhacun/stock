@@ -54,9 +54,14 @@ angular.module('stockApp')
     $scope.stocksDataUpdate($scope.chartShow);
 
     $scope.addStock = function() {
-      if($scope.stockCode === '') {
+      if($scope.stockCode === '') return;
+      //check duplicate
+      if ($scope.stocks.filter(function(stock) {return stock.code === $scope.stockCode;}).length !== 0) {
+        alert ('Already added');
+        $scope.stockCode = '';
         return;
       }
+
       $http.post('/api/things', { code: $scope.stockCode });
       socket.syncUpdates('stock', $scope.stocks);
       $scope.stockDataUpdate($scope.stockCode, $scope.chartShow);
@@ -64,7 +69,12 @@ angular.module('stockApp')
     };
 
     $scope.deleteStock = function(stock) {
+      console.log(stock);
       $http.delete('/api/things/' + stock.code);
+      //remove stock
+      $scope.stocks = $scope.stocks.filter(function(s) {
+        return s.code !== stock.code
+      });
 
       //remove data and update chart
       //TODO: use socket.io
@@ -75,6 +85,6 @@ angular.module('stockApp')
     };
 
     $scope.$on('$destroy', function () {
-      socket.unsyncUpdates('stock', $scope.stocks);
+      //socket.unsyncUpdates('stock', $scope.stocks);
     });
   });
