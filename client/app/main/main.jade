@@ -2,29 +2,29 @@ div(ng-include='"components/navbar/navbar.html"')
 
 header#banner.hero-unit
   .container
-    h1 'Allo, 'Allo!
-    p.lead Kick-start your next web app with Angular Fullstack
+    h1 STOCK Price Chart
+    p.lead Showing stock closed price chart since 2015-JAN-01
     img(src='assets/images/yeoman.png', alt='I\'m Yeoman')
 
-.container.chart-area
-  canvas.chart.chart-line(id='line', chart-data='data', chart-labels='labels', chart-series='series')
+//area to show chart using plotly.js
+.container#stock-chart
 
 .container
   .row
     .col-lg-12
-      h1.page-header Features:
+      h1.page-header Stocks to show:
       ul.nav.nav-tabs.nav-stacked.col-md-4.col-lg-4.col-sm-6(ng-repeat='stock in stocks')
         li
-          a(href='#', tooltip='{{thing.info}}')
-            | {{thing.name}}
-            button.close(type='button', ng-click='deleteThing(thing)') ×
+          a(href='#', tooltip='{{stock.code}}')
+            | {{stock.code}}
+            button.close(type='button', ng-click='deleteStock(stock)') ×
 
   form.thing-form
     label Syncs in realtime across clients
     p.input-group
-      input.form-control(type='text', placeholder='Add a new thing here.', ng-model='newThing')
+      input.form-control(type='text', placeholder='AAPL | GOOG | ...', ng-model='stockCode')
       span.input-group-btn
-        button.btn.btn-primary(type='submit', ng-click='addThing()') Add New
+        button.btn.btn-primary(type='submit', ng-click='addStock()') Add Stock
 
 footer.footer
   .container

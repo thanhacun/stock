@@ -18,14 +18,13 @@ var quandl = {
   dataset: 'https://www.quandl.com/api/v3/datasets/WIKI/',
   key: process.env.QUANDL_KEY || '',
   start: '2015-01-01',
-  end: '2015-12-31'
 }
 
 //Query stock code and save its data to database
 exports.getStockCode = function(req, res) {
   quandl.code = req.params.stockCode;
   var opts = {
-    uri: quandl.dataset + quandl.code + '.json?exclude_column_names=true&column_index=4&start_date=' + quandl.start + '&end_date=' + quandl.end,
+    uri: quandl.dataset + quandl.code + '.json?exclude_column_names=true&column_index=4&start_date=' + quandl.start,
     json: true
   }
   request(opts, function(error, response, body) {
@@ -47,11 +46,11 @@ exports.getStockCode = function(req, res) {
   });
 };
 
-// Get list of things
+// Get list of saved stocks
 exports.index = function(req, res) {
-  Stock.find(function (err, things) {
+  Stock.find(function (err, stocks) {
     if(err) { return handleError(res, err); }
-    return res.status(200).json(things);
+    return res.status(200).json(stocks);
   });
 };
 
@@ -88,7 +87,7 @@ exports.update = function(req, res) {
 
 // Deletes a thing from the DB.
 exports.destroy = function(req, res) {
-  Stock.findById(req.params.id, function (err, thing) {
+  Stock.findOne(req.params.id, function (err, thing) {
     if(err) { return handleError(res, err); }
     if(!thing) { return res.status(404).send('Not Found'); }
     thing.remove(function(err) {

@@ -6,8 +6,7 @@ angular.module('stockApp', [
   'ngSanitize',
   'ngRoute',
   'btford.socket-io',
-  'ui.bootstrap',
-  'chart.js'
+  'ui.bootstrap'
 ])
   .config(function ($routeProvider, $locationProvider) {
     $routeProvider
