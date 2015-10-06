@@ -24,9 +24,9 @@ var quandl = {
 exports.getStockCode = function(req, res) {
   quandl.code = req.params.stockCode;
   var opts = {
-    uri: quandl.dataset + quandl.code + '.json?exclude_column_names=true&column_index=4&start_date=' + quandl.start,
+    uri: quandl.dataset + quandl.code + '.json?exclude_column_names=true&column_index=4&start_date=' + quandl.start + '&api_key=' + quandl.key,
     json: true
-  }
+  };
   request(opts, function(error, response, body) {
     if (error) return handleError(res, error);
     if (body.quandl_error) return res.status(500).json({error: 'incorrect quote'});
@@ -72,6 +72,7 @@ exports.create = function(req, res) {
 };
 
 // Updates an existing thing in the DB.
+// NOT USE
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
   Stock.findById(req.params.id, function (err, thing) {
