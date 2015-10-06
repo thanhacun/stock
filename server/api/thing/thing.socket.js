@@ -4,13 +4,13 @@
 
 'use strict';
 
-var stock = require('./thing.model');
+var Stock = require('./thing.model');
 
 exports.register = function(socket) {
-  stock.schema.post('save', function (doc) {
+  Stock.schema.post('save', function (doc) {
     onSave(socket, doc);
   });
-  stock.schema.post('remove', function (doc) {
+  Stock.schema.post('remove', function (doc) {
     onRemove(socket, doc);
   });
 }

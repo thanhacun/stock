@@ -13,6 +13,8 @@ var StockPriceSchema = new Schema({
 var StockSchema = new Schema({
   code: String,
   name: String,
+  x: [],
+  y: []
   //active: Boolean,
   //data : [StockPriceSchema]
 });

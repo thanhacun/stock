@@ -8,9 +8,5 @@
 var Stock = require('../api/thing/thing.model');
 
 Stock.find({}).remove(function() {
-  Stock.create({
-    code : 'AAPL',
-  }, {
-    code : 'GOOG',
-  });
+  console.log('Remove stocks');
 });
