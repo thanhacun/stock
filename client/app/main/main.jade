@@ -24,8 +24,10 @@ header#banner.hero-unit
     p.input-group
       input.form-control(type='text', placeholder='AAPL | GOOG | MSFT | ...', ng-model='stockCode')
       span.input-group-btn
-        //TODO: spin until done
-        button.btn.btn-primary(type='submit', ng-click='addStock()') Add Stock
+        button.btn.btn-primary(type='submit', ng-click='addStock()', ng-disabled='spin')
+          //spin until done
+          span(ng-hide='spin') Add Stock
+          span.fa.fa-spinner.fa-spin(ng-show='spin')
 
 footer.footer
   .container

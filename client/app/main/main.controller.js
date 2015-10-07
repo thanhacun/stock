@@ -3,7 +3,6 @@
 angular.module('stockApp')
   .controller('MainCtrl', function ($scope, $http, socket) {
     $scope.stocks = [];
-    $scope.stocksData = [];
     $scope.chartLayout = {
       title: 'Stock closed price since 1st January, 2015',
       xaxis: {
@@ -14,39 +13,10 @@ angular.module('stockApp')
       }
     };
     $scope.stockChart = document.getElementById('stock-chart');
-
-    //Return a callback to use with async
-    $scope.stockDataUpdate = function(stock, cb) {
-      $http.get('/api/things/' + stock.code).success(function(stockData) {
-        $scope.stocksData.push(stockData.data);
-        $scope.stocks.push(stock);
-        cb();
-      });
-    };
-
-    $scope.stocksDataUpdate = function(cb) {
-      $http.get('/api/things').success(function(stocks) {
-        console.log(stocks);
-        //$scope.stocks = stocks;
-        //async stocks to get result
-        async.each(stocks, function(stock, callback){
-          $scope.stockDataUpdate(stock, function(){
-            callback();
-          });
-
-        }, function(err){
-          if (!err) {
-            console.log($scope.stocksData);
-            cb();
-          }
-        });
-       });
-
-    };
+    $scope.spin = false;
 
     $scope.chartShow = function() {
       if ($scope.stocks.length !== 0) {
-        //console.log($scope.stocksData);
         Plotly.newPlot($scope.stockChart, $scope.stocks, $scope.chartLayout);
       }
     };
@@ -58,27 +28,32 @@ angular.module('stockApp')
 
       //TODO: WHY syncUpdates has to be here
       socket.syncUpdates('stock', $scope.stocks, function(e, i, a) {
-        //console.log(e, i, a);
+        //stop spinning
+        $scope.spin = false;
+        //update frontend chart
         $scope.chartShow();
-        Plotly.newPlot($scope.stockChart, $scope.stocks, $scope.chartLayout);
       });
 
     });
 
     $scope.addStock = function() {
+      //check empty and duplicate
       if($scope.stockCode === '') return;
-      //check duplicate
       if ($scope.stocks.filter(function(stock) {return stock.code === $scope.stockCode;}).length > 0) {
         alert ('Already added');
         return;
       }
+      //spinning: it takes a litte time to get data
+      //will be disable in syncUpdates
+      $scope.spin = true;
       //add new stock
-      $http.post('/api/things', {code: $scope.stockCode.toUpperCase()}).success(function(stock) {
+      $http.post('/api/things', {code: $scope.stockCode.toUpperCase()}).success(function(newStock) {
         $scope.stockCode = '';
       });
     };
 
     $scope.deleteStock = function(stock) {
+      //console.log(stock);
       $http.delete('/api/things/' + stock._id);
     };
 

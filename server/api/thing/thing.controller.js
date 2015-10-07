@@ -12,66 +12,14 @@
 var _ = require('lodash');
 var request = require('request');
 var async = require('async');
+var _getStockChartData = require('./thing.stockdata').getStockChartData;
 
 var Stock = require('./thing.model');
 
-var quandl = {
-  dataset: 'https://www.quandl.com/api/v3/datasets/WIKI/',
-  key: process.env.QUANDL_KEY || '',
-  start: '2015-01-01',
-}
-
-//Query stock code and save its data to database
-var _getStockChartData = function(stockCode, cb) {
-  var opts = {
-    uri: quandl.dataset + stockCode + '.json?exclude_column_names=true&column_index=4&start_date=' + quandl.start + '&api_key=' + quandl.key,
-    json: true
-  };
-  request(opts, function(error, response, body) {
-    if (error) return;
-    if (body.quandl_error) return;
-    //TODO: consider async here
-    //Return data to match with plotly.js
-    var chartData = body.dataset.data.reduce(function(a, c) {
-      a.x.push(c[0]);
-      a.y.push(c[1]);
-      return a;
-    }, {x: [], y: []});
-    cb({
-      code: stockCode,
-      name: stockCode,
-      x: chartData.x,
-      y: chartData.y
-    })
-  });
-};
 exports.getStockCode = function(req, res) {
-  quandl.code = req.params.stockCode;
-  var opts = {
-    uri: quandl.dataset + quandl.code + '.json?exclude_column_names=true&column_index=4&start_date=' + quandl.start + '&api_key=' + quandl.key,
-    json: true
-  };
-  request(opts, function(error, response, body) {
-    if (error) return handleError(res, error);
-    if (body.quandl_error) return res.status(500).json({error: 'incorrect quote'});
-    //TODO: consider async here
-    //Return data to match with plotly.js
-    var chartData = body.dataset.data.reduce(function(a, c) {
-      a.x.push(c[0]);
-      a.y.push(c[1]);
-      return a;
-    }, {x: [], y: []});
-    return res.status(200).json({
-      data: {
-        x: chartData.x,
-        y: chartData.y,
-        name: body.dataset.dataset_code
-      },
-      //code: body.dataset_code,
-      //name: body.name,
-      //labels: chartData.labels,
-      //data: chartData.data
-    });
+  _getStockChartData(req.params.stockCode, function(err, stock){
+    if (err) return res.status(500).json({error: 'bad connection or incorrect quote'});
+    return res.status(200).json(stock);
   });
 };
 
@@ -79,7 +27,19 @@ exports.getStockCode = function(req, res) {
 exports.index = function(req, res) {
   Stock.find(function (err, stocks) {
     if(err) { return handleError(res, err); }
-    return res.status(200).json(stocks);
+    //async getting stock data
+    var stocksWithData = [];
+    async.each(stocks, function(stock, callback){
+      _getStockChartData(stock.code, function(error, stockWithData) {
+        if (error) callback(error);
+        stockWithData._id = stock._id;
+        stocksWithData.push(stockWithData);
+        callback();
+      });
+    }, function(error){
+      if (error) return handleError(res, err);
+      return res.status(200).json(stocksWithData);
+    });
   });
 };
 
@@ -94,17 +54,17 @@ exports.show = function(req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
-  _getStockChartData(req.body.code, function(newStock) {
-    Stock.create(newStock, function(err, stock) {
-      if (err) return handleError(res, err);
-      return res.status(200).json(stock);
-    });
-  });
-
+  Stock.create(req.body, function(err, newStock) {
+    if (err) return handleError(res, err);
+    return res.status(200).json(newStock);
+  })
   /*
-  Stock.create(req.body, function(err, thing) {
-    if(err) { return handleError(res, err); }
-    return res.status(201).json(thing);
+  _getStockChartData(req.body.code, function(error, newStock) {
+    Stock.create({code: req.body.code}, function(err, stock) {
+      if (err) return handleError(res, err);
+      newStock._id = stock._id;
+      return res.status(200).json(newStock);
+    });
   });
   */
 };
