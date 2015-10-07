@@ -5,8 +5,11 @@ angular.module('stockApp')
     $scope.stocks = [];
     $scope.chartLayout = {
       title: 'Stock closed price since 1st January, 2015',
+      showlegend: true,
       xaxis: {
-        title: 'Date'
+        title: 'Date',
+        //do not show x values
+        showticklabels: false
       },
       yaxis: {
         title: 'Price'
@@ -39,7 +42,7 @@ angular.module('stockApp')
     $scope.addStock = function() {
       //check empty and duplicate
       if($scope.stockCode === '') return;
-      if ($scope.stocks.filter(function(stock) {return stock.code === $scope.stockCode;}).length > 0) {
+      if ($scope.stocks.filter(function(stock) {return stock.code.toUpperCase() === $scope.stockCode.toUpperCase();}).length > 0) {
         alert ('Already added');
         return;
       }
